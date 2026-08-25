@@ -1,0 +1,52 @@
+# .bash_profile
+
+# Get the aliases and functions
+if [ -f ~/.bashrc ]; then
+        . ~/.bashrc
+fi
+
+# User specific environment and startup programs
+export PATH=$PATH:/usr/local/bin
+alias k=kubectl
+complete -o default -F __start_kubectl k
+
+# Initialize Tanzu CLI if not already done
+if [[ ! -d ~/.config/tanzu ]]; then
+  echo "
+Initializing Tanzu CLI environment on first login...
+"
+  tanzu config set env.TANZU_CLI_CEIP_OPT_IN_PROMPT_ANSWER yes
+  tanzu config set env.TKG_CUSTOM_IMAGE_REPOSITORY harbor.cc.net.rogers.com/registry
+  tanzu config eula accept
+  tanzu init
+  tanzu plugin install --group vmware-tkg/default:v2.3.1
+  tanzu plugin sync
+  echo "
+Tanzu CLI initialization complete.
+"
+fi
+
+# Create .kube dir if it does not exist
+if [[ ! -d ~/.kube ]]; then
+  mkdir -m 700 ~/.kube
+  echo "Welcome to $(hostname -s)!"
+  echo "
+As this is your first login you may want to add your kubeconfig file in
+the .kube directory. A kubeconfig is a YAML file that defines the login
+parameters to your K8s cluster, which you would have received from Cloud
+Engineering when your cluster was created.
+
+To create your kubeconfig run the command:
+
+vi ~/.kube/config
+
+and paste the content of the kubeconfig file provided by Cloud Engineering.
+Then you can run the 'kubectl' command to access your Kubernetes cluster.
+
+The name Kubernetes originates from Greek, meaning helmsman or pilot. K8s as
+an abbreviation results from counting the eight letters between the K and the s.
+
+Welcome aboard sailor!
+"
+
+fi
