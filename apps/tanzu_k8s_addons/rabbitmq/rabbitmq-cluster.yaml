@@ -1,0 +1,23 @@
+apiVersion: rabbitmq.com/v1beta1
+kind: RabbitmqCluster
+metadata:
+  name: rabbitmq-cluster
+  namespace: default
+spec:
+  replicas: 3
+  imagePullSecrets:
+  - name: tap-registry
+  rabbitmq:
+    additionalPlugins:
+      - rabbitmq_shovel
+      - rabbitmq_stream
+      - rabbitmq_stream_management
+      - rabbitmq_stream_prometheus
+      - rabbitmq_stream # required for plugin rabbitmq_standby_replication
+      - rabbitmq_schema_definition_sync # plugin that replicates topology objects
+      - rabbitmq_schema_definition_sync_prometheus
+      - rabbitmq_standby_replication # plugin that replicates quorum queue messages
+    additionalConfig: |
+      schema_definition_sync.operating_mode = upstream # required
+      standby.replication.operating_mode = upstream # required
+
