@@ -1,0 +1,22 @@
+apiVersion: acm.vmware.com/v1alpha1
+kind: NodeConfig
+metadata:
+  name: rncc-k8s-mgmt-sde-wlfdle-az01-nodepolicy
+  namespace: tca-system
+spec:
+  config: |
+    fileInjection:
+    - content: |
+        server 172.19.254.12
+        driftfile /var/lib/chrony/drift
+        makestep 1.0 3
+        rtcsync
+        ntsdumpdir /var/lib/chrony
+        logdir /var/log/chrony
+      fileMode: "0644"
+      fileOwner: root:root
+      path: /etc/chrony.conf
+      postAction: systemctl enable chronyd && systemctl restart chronyd
+  jobType: profile
+  nodeMatch:
+  - kubernetes.io/os: "linux"

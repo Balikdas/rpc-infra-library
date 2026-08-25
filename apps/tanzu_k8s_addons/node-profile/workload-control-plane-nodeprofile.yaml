@@ -1,0 +1,20 @@
+apiVersion: acm.vmware.com/v1alpha1
+kind: NodePolicy
+metadata:
+  name: control-plane
+  namespace: rncc-test-north
+spec:
+  nodeSelector:
+    node-role.kubernetes.io/control-plane: ""
+  fileInjection:
+    - path: "/etc/chrony.conf"
+      fileMode: "0644"
+      fileOwner: "root:root"
+      postAction: "systemctl enable chronyd && systemctl restart chronyd"
+      content: |
+        server 172.19.254.12
+        driftfile /var/lib/chrony/drift
+        makestep 1.0 3
+        rtcsync
+        ntsdumpdir /var/lib/chrony
+        logdir /var/log/chrony
